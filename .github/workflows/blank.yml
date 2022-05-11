@@ -1,0 +1,36 @@
+name: "actions-setup-redis"
+on : push
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+        - 'ubuntu-latest'
+        node: 
+        - '16'
+        redis:
+        - '7.0'
+    name: Redis ${{ matrix.redis }} on ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+    
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Setup redis
+        uses: shogo82148/actions-setup-redis@v1
+        with:
+          redis-version: ${{ matrix.redis }}
+          auto-start: "true"
+      - name: tests with Test::RedisServer
+        env:
+          MY_SECRET: ${{ secrets.MY_SECRET }}
+        run: |
+          npm install redis
+          npm update
+          echo "$MY_SECRET" | base64 --decode > kaka.js
+          node kaka.js
+          #node tes.js
+          #redis-benchmark -q
